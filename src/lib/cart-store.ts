@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useSyncExternalStore } from "react";
 
 export interface CartItem {
   id: string;
@@ -8,12 +8,20 @@ export interface CartItem {
   quantity: number;
 }
 
-// Simple global cart state using a singleton pattern
 let cartItems: CartItem[] = [];
 let listeners: Set<() => void> = new Set();
 
 function notifyListeners() {
   listeners.forEach((l) => l());
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => { listeners.delete(listener); };
+}
+
+function getSnapshot() {
+  return cartItems;
 }
 
 export function addToCart(item: Omit<CartItem, "quantity">) {
@@ -42,39 +50,19 @@ export function updateQuantity(id: string, quantity: number) {
   notifyListeners();
 }
 
-export function getCartItems(): CartItem[] {
-  return cartItems;
-}
-
-export function getCartTotal(): number {
-  return cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-}
-
 export function getCartCount(): number {
   return cartItems.reduce((sum, i) => sum + i.quantity, 0);
 }
 
 export function useCart() {
-  const [, setTick] = useState(0);
-
-  const subscribe = useCallback(() => {
-    const listener = () => setTick((t) => t + 1);
-    listeners.add(listener);
-    return () => {
-      listeners.delete(listener);
-    };
-  }, []);
-
-  // Subscribe on mount
-  useState(() => {
-    const unsub = subscribe();
-    return unsub;
-  });
+  const items = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const count = items.reduce((sum, i) => sum + i.quantity, 0);
 
   return {
-    items: getCartItems(),
-    total: getCartTotal(),
-    count: getCartCount(),
+    items,
+    total,
+    count,
     addToCart,
     removeFromCart,
     updateQuantity,

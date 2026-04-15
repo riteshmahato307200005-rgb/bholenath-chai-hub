@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { ContactForm } from "@/components/ContactForm";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -37,7 +38,7 @@ function ContactPage() {
         </div>
       </section>
 
-      {/* Contact Info + Map */}
+      {/* Contact Info + Form */}
       <section className="py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-2">
@@ -72,14 +73,6 @@ function ContactPage() {
                 </div>
 
                 <div className="flex gap-4">
-                  <span className="mt-1 text-2xl">📞</span>
-                  <div>
-                    <h3 className="font-heading font-semibold text-foreground">Phone</h3>
-                    <p className="text-sm text-muted-foreground">+91 98765 43210</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
                   <span className="mt-1 text-2xl">✉️</span>
                   <div>
                     <h3 className="font-heading font-semibold text-foreground">Email</h3>
@@ -108,32 +101,47 @@ function ContactPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Map */}
+              <motion.div
+                className="mt-8 overflow-hidden rounded-2xl shadow-chai"
+              >
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3784.7936!2d73.8567!3d18.4529!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2eaf0b5f2a1a1%3A0x1234567890abcdef!2sKJ%20College%2C%20Yewalewadi%2C%20Pune!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+                  width="100%"
+                  height="300"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Bholenath Chai Location - KJ College Yewalewadi"
+                />
+              </motion.div>
             </motion.div>
 
-            {/* Map */}
+            {/* Contact Form */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="overflow-hidden rounded-2xl shadow-chai"
+              className="rounded-2xl bg-cream-section p-8 shadow-chai"
             >
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3784.7936!2d73.8567!3d18.4529!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2eaf0b5f2a1a1%3A0x1234567890abcdef!2sKJ%20College%2C%20Yewalewadi%2C%20Pune!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
-                width="100%"
-                height="100%"
-                style={{ border: 0, minHeight: "450px" }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Bholenath Chai Location - KJ College Yewalewadi"
-              />
+              <h2 className="font-heading text-2xl font-bold text-foreground">
+                Get In Touch 💬
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Have questions about bulk orders, event catering, or anything else? Fill out the form below and we'll get back to you!
+              </p>
+              <div className="mt-6">
+                <ContactForm />
+              </div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
+      {/* Additional Info Section */}
       <section className="bg-cream-section py-16">
         <div className="mx-auto max-w-3xl px-4 text-center">
           <motion.div
@@ -146,14 +154,8 @@ function ContactPage() {
             </h2>
             <p className="mt-4 text-muted-foreground">
               Planning a college event, farewell party, or department gathering?
-              We offer special bulk pricing for chai and snacks. Contact us to discuss!
+              We offer special bulk pricing for chai and snacks. Fill out the form above with your event details and we'll send you a custom quote!
             </p>
-            <a
-              href="tel:+919876543210"
-              className="mt-6 inline-block rounded-full bg-gradient-saffron px-8 py-3 font-semibold text-primary-foreground transition-transform hover:scale-105"
-            >
-              Call Us Now 📞
-            </a>
           </motion.div>
         </div>
       </section>

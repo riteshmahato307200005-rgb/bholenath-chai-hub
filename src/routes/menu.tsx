@@ -1,8 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ShoppingCart } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { menuItems, categories } from "@/lib/menu-data";
-import { addToCart } from "@/lib/cart-store";
+import { addToCart, useCart } from "@/lib/cart-store";
 
 export const Route = createFileRoute("/menu")({
   head: () => ({
@@ -17,6 +19,8 @@ export const Route = createFileRoute("/menu")({
 });
 
 function MenuPage() {
+  const navigate = useNavigate();
+  const { count, total } = useCart();
   const [activeCategory, setActiveCategory] = useState<string>("tea");
   const filtered = menuItems.filter((i) => i.category === activeCategory);
 
@@ -117,6 +121,32 @@ function MenuPage() {
           </motion.div>
         </AnimatePresence>
       </div>
+
+      {/* Floating Cart Summary */}
+      {count > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 100 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 100 }}
+          className="fixed bottom-0 left-0 right-0 border-t border-border bg-background/95 backdrop-blur-sm md:bottom-8 md:right-8 md:w-80 md:rounded-lg md:border md:shadow-lg"
+        >
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <ShoppingCart className="w-5 h-5 text-saffron" />
+                <span className="font-semibold text-foreground">{count} items</span>
+              </div>
+              <span className="text-xl font-bold text-saffron">₹{total}</span>
+            </div>
+            <Button
+              onClick={() => navigate({ to: "/checkout" })}
+              className="w-full bg-gradient-saffron text-white"
+            >
+              Proceed to Checkout →
+            </Button>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }

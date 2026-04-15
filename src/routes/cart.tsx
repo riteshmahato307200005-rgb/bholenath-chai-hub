@@ -5,7 +5,7 @@ import { useCart } from "@/lib/cart-store";
 export const Route = createFileRoute("/cart")({
   head: () => ({
     meta: [
-      { title: "Cart — Bholenath Chai & Snacks Center" },
+      { title: "Cart - Bholenath Chai & Snacks Center" },
       { name: "description", content: "Review your cart and checkout." },
     ],
   }),
@@ -17,7 +17,6 @@ function CartPage() {
 
   return (
     <div className="min-h-screen pt-20 md:pt-24">
-      {/* Header */}
       <section className="bg-brown-section py-12 text-center">
         <h1 className="font-heading text-4xl font-bold text-cream sm:text-5xl">
           Your <span className="text-saffron">Cart</span>
@@ -31,12 +30,12 @@ function CartPage() {
             animate={{ opacity: 1 }}
             className="py-20 text-center"
           >
-            <span className="text-6xl">☕</span>
+            <span className="text-6xl">Chai</span>
             <h2 className="mt-4 font-heading text-2xl font-bold text-foreground">
               Your cart is empty
             </h2>
             <p className="mt-2 text-muted-foreground">
-              Time to add some delicious chai and snacks!
+              Time to add some delicious chai and snacks.
             </p>
             <Link
               to="/menu"
@@ -47,7 +46,6 @@ function CartPage() {
           </motion.div>
         ) : (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            {/* Cart items */}
             <div className="space-y-4">
               {items.map((item) => (
                 <motion.div
@@ -69,18 +67,17 @@ function CartPage() {
                     <h3 className="font-heading font-semibold text-foreground">
                       {item.name}
                     </h3>
-                    <p className="text-sm text-saffron-dark font-medium">
-                      ₹{item.price} each
+                    <p className="text-sm font-medium text-saffron-dark">
+                      Rs. {item.price} each
                     </p>
                   </div>
 
-                  {/* Quantity controls */}
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
                       className="flex h-8 w-8 items-center justify-center rounded-full bg-secondary text-secondary-foreground transition-colors hover:bg-saffron/20"
                     >
-                      −
+                      -
                     </button>
                     <span className="w-6 text-center font-medium">
                       {item.quantity}
@@ -94,7 +91,7 @@ function CartPage() {
                   </div>
 
                   <p className="w-16 text-right font-bold text-foreground">
-                    ₹{item.price * item.quantity}
+                    Rs. {item.price * item.quantity}
                   </p>
 
                   <button
@@ -102,25 +99,29 @@ function CartPage() {
                     className="text-muted-foreground transition-colors hover:text-destructive"
                     aria-label="Remove item"
                   >
-                    ✕
+                    x
                   </button>
                 </motion.div>
               ))}
             </div>
 
-            {/* Total & checkout */}
             <div className="mt-8 rounded-xl bg-card p-6 shadow-md">
               <div className="flex items-center justify-between">
-                <span className="text-lg font-medium text-muted-foreground">Total</span>
+                <span className="text-lg font-medium text-muted-foreground">
+                  Total
+                </span>
                 <span className="font-heading text-3xl font-bold text-saffron-dark">
-                  ₹{total}
+                  Rs. {total}
                 </span>
               </div>
-              <button className="mt-6 w-full rounded-full bg-gradient-saffron py-4 text-lg font-semibold text-primary-foreground shadow-chai transition-transform hover:scale-[1.02] active:scale-[0.98]">
-                Proceed to Checkout ☕
-              </button>
+              <Link
+                to="/checkout"
+                className="mt-6 block w-full rounded-full bg-gradient-saffron py-4 text-center text-lg font-semibold text-primary-foreground shadow-chai transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              >
+                Proceed to Checkout
+              </Link>
               <p className="mt-3 text-center text-xs text-muted-foreground">
-                Payment integration coming soon!
+                Cash and Razorpay payments are available at checkout.
               </p>
             </div>
           </motion.div>

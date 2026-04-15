@@ -54,6 +54,15 @@ export function getCartCount(): number {
   return cartItems.reduce((sum, i) => sum + i.quantity, 0);
 }
 
+export function clearCart() {
+  cartItems = [];
+  notifyListeners();
+}
+
+export function useCartSnapshot() {
+  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+}
+
 export function useCart() {
   const items = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
   const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);

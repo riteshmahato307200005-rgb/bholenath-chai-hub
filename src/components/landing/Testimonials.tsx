@@ -21,7 +21,7 @@ const testimonials = [
   },
   {
     name: "Prachi Deshmukh",
-    role: "B.Sc IT, 2nd Year",
+    role: "B.Tech IT, 2nd Year",
     text: "The kulhad chai here hits different on a rainy day. Also the bhaiya is super friendly and remembers everyone's order. True MVP!",
     rating: 5,
   },
@@ -33,7 +33,7 @@ const testimonials = [
   },
   {
     name: "Aisha Khan",
-    role: "BBA, 2nd Year",
+    role: "B.Tech E&TC, 2nd Year",
     text: "Cleanest chai stall near campus. Fresh ingredients, quick service, and the bread pakora is actually SO good. My whole group is addicted.",
     rating: 5,
   },

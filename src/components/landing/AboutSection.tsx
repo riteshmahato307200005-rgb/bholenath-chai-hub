@@ -16,7 +16,7 @@ export function AboutSection() {
           >
             <img
               src={aboutImage}
-              alt="Traditional chai stall with warm lighting"
+              alt="Bholenath Chai stall at KJ College campus"
               className="h-full w-full object-cover"
               loading="lazy"
               width={800}
@@ -35,24 +35,25 @@ export function AboutSection() {
               Our Story
             </p>
             <h2 className="mt-3 font-heading text-3xl font-bold text-chai-brown sm:text-4xl lg:text-5xl">
-              A Chai Stall Born from{" "}
+              The Campus Chai Stall Built on{" "}
               <span className="text-gradient-saffron">Devotion</span>
             </h2>
             <p className="mt-6 text-base leading-relaxed text-muted-foreground sm:text-lg">
-              What started as a humble roadside chai stall near the temple has grown into
-              a beloved community spot. Inspired by the spirit of Lord Bholenath — simplicity,
-              warmth, and generosity — we brew every cup with fresh spices, pure milk, and
-              heartfelt devotion.
+              What started as a small chai stall near the gates of KJ College, Yewalewadi
+              has become the heartbeat of campus life. Inspired by the spirit of Lord
+              Bholenath — simplicity, warmth, and generosity — we brew every cup with
+              fresh spices, pure milk, and a whole lot of love.
             </p>
             <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Our recipes are passed down through generations, using hand-ground masalas
-              and the finest Assam tea leaves. Every sip is a journey through India's
-              rich chai heritage.
+              From early morning lectures to late-night study sessions, students count
+              on us for their daily chai fix. Our recipes use hand-ground masalas and
+              the finest Assam tea leaves — because college students deserve premium
+              chai at student-friendly prices.
             </p>
             <div className="mt-8 grid grid-cols-3 gap-6 text-center">
               {[
-                { num: "5+", label: "Years Serving" },
-                { num: "10K+", label: "Happy Customers" },
+                { num: "3+", label: "Years at KJ" },
+                { num: "5K+", label: "Happy Students" },
                 { num: "20+", label: "Menu Items" },
               ].map((stat) => (
                 <div key={stat.label}>

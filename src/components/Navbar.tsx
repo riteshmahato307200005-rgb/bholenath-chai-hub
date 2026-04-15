@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getCartCount } from "@/lib/cart-store";
+import logo from "@/assets/logo.png";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,11 +15,17 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Poll cart count (simple approach)
   useEffect(() => {
     const interval = setInterval(() => setCartCount(getCartCount()), 300);
     return () => clearInterval(interval);
   }, []);
+
+  const navLinks = [
+    { to: "/" as const, label: "Home" },
+    { to: "/menu" as const, label: "Menu" },
+    { to: "/contact" as const, label: "Contact" },
+    { to: "/cart" as const, label: "Cart" },
+  ];
 
   return (
     <motion.nav
@@ -34,19 +41,16 @@ export function Navbar() {
         <div className="flex h-16 items-center justify-between md:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
+            <img src={logo} alt="Bholenath Chai" className="h-8 w-8 md:h-10 md:w-10" width={40} height={40} />
             <span className="text-xl font-bold font-heading md:text-2xl">
-              <span className={scrolled ? "text-saffron" : "text-saffron"}>Bholenath</span>
+              <span className="text-saffron">Bholenath</span>
               <span className={scrolled ? "text-accent-foreground" : "text-cream"}> Chai</span>
             </span>
           </Link>
 
           {/* Desktop nav */}
           <div className="hidden items-center gap-8 md:flex">
-            {[
-              { to: "/", label: "Home" },
-              { to: "/menu", label: "Menu" },
-              { to: "/cart", label: "Cart" },
-            ].map((link) => (
+            {navLinks.map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
@@ -103,11 +107,7 @@ export function Navbar() {
             className="overflow-hidden bg-accent/95 backdrop-blur-md md:hidden"
           >
             <div className="flex flex-col gap-4 px-4 py-6">
-              {[
-                { to: "/" as const, label: "Home" },
-                { to: "/menu" as const, label: "Menu" },
-                { to: "/cart" as const, label: "Cart" },
-              ].map((link) => (
+              {navLinks.map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}

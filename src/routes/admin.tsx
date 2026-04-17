@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -11,12 +12,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockOrders, type Order } from "@/lib/server-actions";
+import {
+  deleteOrder,
+  fetchOrdersRealTime,
+  updateOrderStatus,
+  type Order,
+} from "@/lib/database";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "Admin Dashboard — Bholenath Chai" },
+      { title: "Admin Dashboard - Bholenath Chai" },
       { name: "description", content: "Admin dashboard for order management" },
     ],
   }),
@@ -26,37 +32,157 @@ export const Route = createFileRoute("/admin")({
 function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [adminPassword, setAdminPassword] = useState("");
-  const [orders, setOrders] = useState<Order[]>(mockOrders);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const previousOrderIdsRef = useRef<Set<string>>(new Set());
+  const hasLoadedInitialOrdersRef = useRef(false);
+  const audioContextRef = useRef<AudioContext | null>(null);
 
   const ADMIN_PASSWORD = "chai123";
+
+  const playNotificationSound = async () => {
+    try {
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as typeof window & {
+          webkitAudioContext?: typeof AudioContext;
+        }).webkitAudioContext;
+
+      if (!AudioContextClass) return;
+
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContextClass();
+      }
+
+      if (audioContextRef.current.state === "suspended") {
+        await audioContextRef.current.resume();
+      }
+
+      const context = audioContextRef.current;
+      const oscillator = context.createOscillator();
+      const gainNode = context.createGain();
+      const startTime = context.currentTime;
+
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(880, startTime);
+      oscillator.frequency.exponentialRampToValueAtTime(660, startTime + 0.18);
+
+      gainNode.gain.setValueAtTime(0.0001, startTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.18, startTime + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.22);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(context.destination);
+      oscillator.start(startTime);
+      oscillator.stop(startTime + 0.22);
+    } catch (soundError) {
+      console.error("Notification sound failed:", soundError);
+    }
+  };
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    setIsLoading(true);
+    let unsubscribe: (() => void) | undefined;
+
+    const setupRealTime = async () => {
+      try {
+        unsubscribe = await fetchOrdersRealTime((data) => {
+          const nextOrderIds = new Set(
+            data.map((order) => order.id).filter(Boolean) as string[]
+          );
+
+          if (hasLoadedInitialOrdersRef.current) {
+            const newOrders = data.filter(
+              (order) => order.id && !previousOrderIdsRef.current.has(order.id)
+            );
+
+            if (newOrders.length > 0) {
+              const latestOrder = newOrders.sort(
+                (a, b) =>
+                  new Date(b.created_at || 0).getTime() -
+                  new Date(a.created_at || 0).getTime()
+              )[0];
+
+              void playNotificationSound();
+              toast.success("New order received", {
+                description: `${latestOrder.customer_name} placed an order for Rs. ${latestOrder.total_amount}.`,
+              });
+            }
+          } else {
+            hasLoadedInitialOrdersRef.current = true;
+          }
+
+          previousOrderIdsRef.current = nextOrderIds;
+          setOrders(data);
+          setError(null);
+          setIsLoading(false);
+        });
+      } catch (err) {
+        setError("Failed to connect to database");
+        setIsLoading(false);
+        console.error("Real-time setup error:", err);
+      }
+    };
+
+    void setupRealTime();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    return () => {
+      if (audioContextRef.current) {
+        void audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+    };
+  }, []);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (adminPassword === ADMIN_PASSWORD) {
       setIsLoggedIn(true);
       setAdminPassword("");
-    } else {
-      alert("❌ Incorrect password");
+      setError(null);
+      return;
+    }
+
+    setError("Incorrect password");
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setAdminPassword("");
+    setOrders([]);
+    setError(null);
+    previousOrderIdsRef.current = new Set();
+    hasLoadedInitialOrdersRef.current = false;
+  };
+
+  const handleStatusChange = async (orderId: string, newStatus: string) => {
+    try {
+      await updateOrderStatus(orderId, newStatus);
+    } catch (err) {
+      setError("Failed to update order status");
+      console.error("Status update error:", err);
     }
   };
 
-  const handleStatusChange = (orderId: string, newStatus: string) => {
-    setOrders((prev) =>
-      prev.map((order) =>
-        order.id === orderId
-          ? { ...order, status: newStatus as any }
-          : order
-      )
-    );
-    console.log(`✏️ Order ${orderId} status updated to: ${newStatus}`);
-  };
+  const handleDeleteOrder = async (orderId: string) => {
+    if (!confirm("Are you sure you want to delete this order?")) return;
 
-  const handleDeleteOrder = (orderId: string) => {
-    if (confirm("Are you sure you want to delete this order?")) {
-      setOrders((prev) => prev.filter((order) => order.id !== orderId));
-      console.log(`🗑️ Order ${orderId} deleted`);
+    try {
+      await deleteOrder(orderId);
+    } catch (err) {
+      setError("Failed to delete order");
+      console.error("Delete error:", err);
     }
   };
 
@@ -105,7 +231,7 @@ function AdminPage() {
         >
           <div className="text-center mb-8">
             <h1 className="text-3xl font-heading font-bold text-chai-brown">
-              ☕ Admin Portal
+              Admin Portal
             </h1>
             <p className="text-sm text-muted-foreground mt-2">
               Bholenath Chai & Snacks
@@ -128,6 +254,7 @@ function AdminPage() {
                 Demo: chai123
               </p>
             </div>
+            {error && <p className="text-sm text-red-600">{error}</p>}
             <Button
               type="submit"
               className="w-full bg-gradient-saffron text-white font-semibold"
@@ -135,20 +262,6 @@ function AdminPage() {
               Login
             </Button>
           </form>
-
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-xs text-blue-900">
-              <strong>🔐 Setup Instructions:</strong>
-              <br />
-              1. Create Supabase account (free)
-              <br />
-              2. Copy SQL from DATABASE_SETUP.md
-              <br />
-              3. Create .env.local with API keys
-              <br />
-              4. Deploy to Netlify
-            </p>
-          </div>
         </motion.div>
       </div>
     );
@@ -156,7 +269,6 @@ function AdminPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-cream-section to-background pt-24 pb-10">
-      {/* Header */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -165,23 +277,23 @@ function AdminPage() {
         >
           <div>
             <h1 className="text-3xl font-heading font-bold text-foreground">
-              📊 Order Dashboard
+              Order Dashboard
             </h1>
             <p className="text-muted-foreground mt-1">
-              Total Orders: <span className="font-semibold">{orders.length}</span>
+              {isLoading ? "Loading..." : `Total Orders: ${orders.length}`}
             </p>
           </div>
-          <Button
-            onClick={() => {
-              setIsLoggedIn(false);
-            }}
-            variant="outline"
-          >
+          <Button onClick={handleLogout} variant="outline">
             Logout
           </Button>
         </motion.div>
 
-        {/* Stats */}
+        {error && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
         <div className="grid gap-4 sm:grid-cols-4 mb-8">
           {[
             {
@@ -219,7 +331,6 @@ function AdminPage() {
           ))}
         </div>
 
-        {/* Filters */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -257,7 +368,6 @@ function AdminPage() {
           </div>
         </motion.div>
 
-        {/* Orders Table */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -327,7 +437,7 @@ function AdminPage() {
                         ))}
                       </td>
                       <td className="px-4 py-3 text-sm font-semibold">
-                        ₹{order.total_amount}
+                        Rs. {order.total_amount}
                       </td>
                       <td className="px-4 py-3 text-sm">
                         <Select
@@ -337,9 +447,7 @@ function AdminPage() {
                           }
                         >
                           <SelectTrigger
-                            className={`w-32 ${getStatusColor(
-                              order.status
-                            )}`}
+                            className={`w-32 ${getStatusColor(order.status)}`}
                           >
                             <SelectValue />
                           </SelectTrigger>
@@ -369,7 +477,7 @@ function AdminPage() {
                           onClick={() => handleDeleteOrder(order.id || "")}
                           className="text-red-600 hover:text-red-800"
                         >
-                          🗑️
+                          Delete
                         </Button>
                       </td>
                     </motion.tr>

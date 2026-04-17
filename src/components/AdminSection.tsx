@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -26,10 +27,54 @@ export function AdminSection() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const previousOrderIdsRef = useRef<Set<string>>(new Set());
+  const hasLoadedInitialOrdersRef = useRef(false);
+  const audioContextRef = useRef<AudioContext | null>(null);
 
   // Default owner credentials (update these with your owner details)
   const OWNER_USERNAME = "owner";
   const OWNER_PASSWORD = "bholenath123";
+
+  const playNotificationSound = async () => {
+    try {
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as typeof window & {
+          webkitAudioContext?: typeof AudioContext;
+        }).webkitAudioContext;
+
+      if (!AudioContextClass) return;
+
+      if (!audioContextRef.current) {
+        audioContextRef.current = new AudioContextClass();
+      }
+
+      if (audioContextRef.current.state === "suspended") {
+        await audioContextRef.current.resume();
+      }
+
+      const context = audioContextRef.current;
+      const oscillator = context.createOscillator();
+      const gainNode = context.createGain();
+      const startTime = context.currentTime;
+
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(880, startTime);
+      oscillator.frequency.exponentialRampToValueAtTime(660, startTime + 0.18);
+
+      gainNode.gain.setValueAtTime(0.0001, startTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.18, startTime + 0.02);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.22);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(context.destination);
+
+      oscillator.start(startTime);
+      oscillator.stop(startTime + 0.22);
+    } catch (soundError) {
+      console.error("Notification sound failed:", soundError);
+    }
+  };
 
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -40,6 +85,30 @@ export function AdminSection() {
     const setupRealTime = async () => {
       try {
         unsubscribe = await fetchOrdersRealTime((data) => {
+          const nextOrderIds = new Set(data.map((order) => order.id));
+
+          if (hasLoadedInitialOrdersRef.current) {
+            const newOrders = data.filter(
+              (order) => !previousOrderIdsRef.current.has(order.id)
+            );
+
+            if (newOrders.length > 0) {
+              const latestOrder = newOrders.sort(
+                (a, b) =>
+                  new Date(b.created_at || 0).getTime() -
+                  new Date(a.created_at || 0).getTime()
+              )[0];
+
+              void playNotificationSound();
+              toast.success("New order received", {
+                description: `${latestOrder.customer_name} placed an order for Rs. ${latestOrder.total_amount}.`,
+              });
+            }
+          } else {
+            hasLoadedInitialOrdersRef.current = true;
+          }
+
+          previousOrderIdsRef.current = nextOrderIds;
           setOrders(data);
           setError(null);
           setIsLoading(false);
@@ -77,7 +146,18 @@ export function AdminSection() {
     setAdminPassword("");
     setOrders([]);
     setError(null);
+    previousOrderIdsRef.current = new Set();
+    hasLoadedInitialOrdersRef.current = false;
   };
+
+  useEffect(() => {
+    return () => {
+      if (audioContextRef.current) {
+        void audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+    };
+  }, []);
 
   const handleStatusChange = async (orderId: string, newStatus: string) => {
     try {

@@ -37,6 +37,16 @@ type VerifyPaymentInput = {
   };
 };
 
+type PlaceCashOrderInput = {
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  items: OrderItem[];
+  total_amount: number;
+  order_type?: "dine-in" | "takeaway" | "delivery";
+  special_instructions?: string;
+};
+
 function getEnvValue(name: string) {
   return import.meta.env[name] ?? process.env[name];
 }
@@ -96,6 +106,16 @@ function isValidItems(items: unknown): items is OrderItem[] {
   );
 }
 
+function isValidOrderPayload(order: PlaceCashOrderInput | VerifyPaymentInput["order"]) {
+  return (
+    !!order?.customer_name &&
+    !!order.customer_email &&
+    !!order.customer_phone &&
+    isValidAmount(order.total_amount) &&
+    isValidItems(order.items)
+  );
+}
+
 export const createPaymentOrder = createServerFn({ method: "POST" })
   .inputValidator((data: CreatePaymentOrderInput) => data)
   .handler(async ({ data }) => {
@@ -130,6 +150,49 @@ export const createPaymentOrder = createServerFn({ method: "POST" })
     };
   });
 
+export const placeCashOrder = createServerFn({ method: "POST" })
+  .inputValidator((data: PlaceCashOrderInput) => data)
+  .handler(async ({ data }) => {
+    if (!isValidOrderPayload(data)) {
+      throw new Error("Invalid cash order payload.");
+    }
+
+    const supabase = getSupabaseAdminClient();
+
+    if (!supabase) {
+      throw new Error(
+        "Supabase server credentials are missing. Add VITE_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY."
+      );
+    }
+
+    const { data: insertedOrder, error } = await supabase
+      .from("orders")
+      .insert([
+        {
+          customer_name: data.customer_name,
+          customer_email: data.customer_email,
+          customer_phone: data.customer_phone,
+          items: data.items,
+          total_amount: data.total_amount,
+          status: "pending",
+          order_type: data.order_type || "dine-in",
+          special_instructions: data.special_instructions || null,
+        },
+      ])
+      .select("id")
+      .single();
+
+    if (error) {
+      console.error("Supabase insert error for cash order:", error);
+      throw new Error("Cash order could not be saved to the database.");
+    }
+
+    return {
+      success: true,
+      orderId: insertedOrder.id,
+    };
+  });
+
 export const verifyPayment = createServerFn({ method: "POST" })
   .inputValidator((data: VerifyPaymentInput) => data)
   .handler(async ({ data }) => {
@@ -140,11 +203,7 @@ export const verifyPayment = createServerFn({ method: "POST" })
       !payment?.razorpay_order_id ||
       !payment.razorpay_payment_id ||
       !payment.razorpay_signature ||
-      !order?.customer_name ||
-      !order.customer_email ||
-      !order.customer_phone ||
-      !isValidAmount(order.total_amount) ||
-      !isValidItems(order.items)
+      !isValidOrderPayload(order)
     ) {
       throw new Error("Invalid payment verification payload.");
     }

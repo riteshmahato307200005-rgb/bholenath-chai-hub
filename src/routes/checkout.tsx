@@ -7,9 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { clearCart, useCartSnapshot } from "@/lib/cart-store";
-import { submitOrder } from "@/lib/database";
 import { saveInvoice } from "@/lib/invoice";
-import { createPaymentOrder, verifyPayment } from "@/lib/payment-server";
+import {
+  createPaymentOrder,
+  placeCashOrder,
+  verifyPayment,
+} from "@/lib/payment-server";
 
 type PaymentMethod = "cash" | "online";
 
@@ -75,6 +78,7 @@ function CheckoutPage() {
   const navigate = useNavigate();
   const cartItems = useCartSnapshot();
   const createPaymentOrderFn = useServerFn(createPaymentOrder);
+  const placeCashOrderFn = useServerFn(placeCashOrder);
   const verifyPaymentFn = useServerFn(verifyPayment);
   const [formData, setFormData] = useState({
     name: "",
@@ -131,21 +135,22 @@ function CheckoutPage() {
     return details.join(" | ");
   };
 
-  const placeCashOrder = async () => {
-    await submitOrder({
-      customer_name: formData.name.trim(),
-      customer_email: formData.email.trim(),
-      customer_phone: formData.phone.replace(/\D/g, ""),
-      items: cartItems.map((item) => ({
-        id: item.id,
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-      })),
-      total_amount: totalAmount,
-      status: "pending",
-      order_type: "dine-in",
-      special_instructions: buildSpecialInstructions("Payment: Cash on pickup"),
+  const submitCashOrder = async () => {
+    await placeCashOrderFn({
+      data: {
+        customer_name: formData.name.trim(),
+        customer_email: formData.email.trim(),
+        customer_phone: formData.phone.replace(/\D/g, ""),
+        items: cartItems.map((item) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+        })),
+        total_amount: totalAmount,
+        order_type: "dine-in",
+        special_instructions: buildSpecialInstructions("Payment: Cash on pickup"),
+      },
     });
 
     setSubmitStatus({
@@ -307,7 +312,7 @@ function CheckoutPage() {
       validateForm();
 
       if (paymentMethod === "cash") {
-        await placeCashOrder();
+        await submitCashOrder();
         return;
       }
 

@@ -33,6 +33,10 @@ CREATE TABLE orders (
   items JSONB NOT NULL,
   total_amount DECIMAL(10, 2) NOT NULL,
   status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending', 'preparing', 'ready', 'completed', 'cancelled')),
+  payment_method VARCHAR(20) DEFAULT 'cash' CHECK (payment_method IN ('cash', 'online')),
+  payment_status VARCHAR(20) DEFAULT 'pending' CHECK (payment_status IN ('created', 'authorized', 'captured', 'failed', 'pending')),
+  razorpay_order_id VARCHAR(255),
+  razorpay_payment_id VARCHAR(255),
   special_instructions TEXT,
   order_type VARCHAR(50) DEFAULT 'dine-in' CHECK (order_type IN ('dine-in', 'takeaway', 'delivery')),
   created_at TIMESTAMP DEFAULT NOW(),
@@ -54,6 +58,8 @@ CREATE TABLE admin_users (
 CREATE INDEX idx_orders_status ON orders(status);
 CREATE INDEX idx_orders_created_at ON orders(created_at DESC);
 CREATE INDEX idx_orders_customer_email ON orders(customer_email);
+CREATE INDEX idx_orders_razorpay_order_id ON orders(razorpay_order_id);
+CREATE INDEX idx_orders_razorpay_payment_id ON orders(razorpay_payment_id);
 
 -- Enable Row Level Security (RLS)
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
@@ -62,6 +68,19 @@ ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
 -- Create RLS policies
 CREATE POLICY "Anyone can read orders" ON orders FOR SELECT USING (TRUE);
 CREATE POLICY "Authenticated users can insert orders" ON orders FOR INSERT WITH CHECK (TRUE);
+```
+
+If your `orders` table already exists, run this migration instead of recreating it:
+
+```sql
+ALTER TABLE orders
+  ADD COLUMN IF NOT EXISTS payment_method VARCHAR(20) DEFAULT 'cash',
+  ADD COLUMN IF NOT EXISTS payment_status VARCHAR(20) DEFAULT 'pending',
+  ADD COLUMN IF NOT EXISTS razorpay_order_id VARCHAR(255),
+  ADD COLUMN IF NOT EXISTS razorpay_payment_id VARCHAR(255);
+
+CREATE INDEX IF NOT EXISTS idx_orders_razorpay_order_id ON orders(razorpay_order_id);
+CREATE INDEX IF NOT EXISTS idx_orders_razorpay_payment_id ON orders(razorpay_payment_id);
 ```
 
 4. Click **Run** to execute the SQL
@@ -114,6 +133,9 @@ function getSupabaseClient() {
    - `PUBLIC_SUPABASE_URL`
    - `PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
+   - `VITE_RAZORPAY_KEY_ID`
+   - `RAZORPAY_KEY_SECRET`
+   - `RAZORPAY_WEBHOOK_SECRET`
 
 ### Step 3: Configure Build
 Build command:

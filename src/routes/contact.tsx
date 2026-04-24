@@ -107,7 +107,7 @@ function ContactPage() {
                 className="mt-8 overflow-hidden rounded-2xl shadow-chai"
               >
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3784.7936!2d73.8567!3d18.4529!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2eaf0b5f2a1a1%3A0x1234567890abcdef!2sKJ%20College%2C%20Yewalewadi%2C%20Pune!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+                  src="https://www.google.com/maps?q=KJ%20College%20Campus%2C%20Yewalewadi%2C%20Pune%20411048&z=16&output=embed"
                   width="100%"
                   height="300"
                   style={{ border: 0 }}
@@ -117,6 +117,14 @@ function ContactPage() {
                   title="Bholenath Chai Location - KJ College Yewalewadi"
                 />
               </motion.div>
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=KJ%20College%20Campus%2C%20Yewalewadi%2C%20Pune%20411048"
+                target="_blank"
+                rel="noreferrer"
+                className="mt-3 inline-flex text-sm font-semibold text-saffron-dark hover:text-saffron"
+              >
+                Open in Google Maps
+              </a>
             </motion.div>
 
             {/* Contact Form */}

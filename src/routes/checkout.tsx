@@ -217,6 +217,8 @@ function CheckoutPage() {
           price: item.price,
           quantity: item.quantity,
         })),
+        orderType: "dine-in",
+        specialInstructions: buildSpecialInstructions("Payment: Razorpay"),
       },
     })) as RazorpayCreateOrderResponse;
 

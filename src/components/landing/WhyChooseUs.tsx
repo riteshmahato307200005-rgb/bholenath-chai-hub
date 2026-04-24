@@ -1,25 +1,48 @@
 import { motion } from "framer-motion";
+import {
+  Flame,
+  Leaf,
+  PackageCheck,
+  Sparkles,
+  Wallet,
+  Zap,
+  type LucideIcon,
+} from "lucide-react";
 
-const reasons = [
+const reasons: Array<{
+  icon: LucideIcon;
+  title: string;
+  description: string;
+}> = [
   {
-    icon: "🍃",
+    icon: Sparkles,
     title: "Fresh Spices Daily",
-    description: "Hand-ground masalas prepared every morning for the freshest flavor",
+    description: "Hand-ground masalas prepared every morning for a fresher and richer taste.",
   },
   {
-    icon: "🥛",
-    title: "Pure & Natural",
-    description: "Only pure milk and natural ingredients — no artificial additives",
+    icon: Leaf,
+    title: "Pure and Natural",
+    description: "Made with pure milk and natural ingredients, without unnecessary additives.",
   },
   {
-    icon: "🔥",
-    title: "Brewed with Love",
-    description: "Traditional slow-brew method on open flame for the perfect taste",
+    icon: Flame,
+    title: "Brewed with Care",
+    description: "Traditional slow-brew preparation keeps the chai flavor strong and consistent.",
   },
   {
-    icon: "💰",
+    icon: Wallet,
     title: "Pocket Friendly",
-    description: "Premium taste at prices everyone can enjoy, every single day",
+    description: "Student-friendly pricing keeps everyday chai and snack breaks affordable.",
+  },
+  {
+    icon: PackageCheck,
+    title: "Track Your Order",
+    description: "Customers can follow order progress from placed to ready in a simple tracked flow.",
+  },
+  {
+    icon: Zap,
+    title: "Faster Reordering",
+    description: "Login, save your details, and place repeat orders much faster next time.",
   },
 ];
 
@@ -41,25 +64,31 @@ export function WhyChooseUs() {
           </h2>
         </motion.div>
 
-        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {reasons.map((item, i) => (
-            <motion.div
-              key={item.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="rounded-2xl border border-cream/10 bg-cream/5 p-6 text-center backdrop-blur-sm transition-colors hover:border-saffron/30"
-            >
-              <span className="text-4xl">{item.icon}</span>
-              <h3 className="mt-4 font-heading text-lg font-semibold text-cream">
-                {item.title}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-cream/60">
-                {item.description}
-              </p>
-            </motion.div>
-          ))}
+        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {reasons.map((item, i) => {
+            const Icon = item.icon;
+
+            return (
+              <motion.div
+                key={item.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.08 }}
+                className="rounded-2xl border border-cream/10 bg-cream/5 p-6 text-center backdrop-blur-sm transition-colors hover:border-saffron/30"
+              >
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-cream/10 text-saffron-light">
+                  <Icon className="h-7 w-7" />
+                </div>
+                <h3 className="mt-4 font-heading text-lg font-semibold text-cream">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-cream/60">
+                  {item.description}
+                </p>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>

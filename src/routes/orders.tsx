@@ -58,6 +58,16 @@ function OrdersPage() {
     }
   };
 
+  const orderStages = ["pending", "preparing", "ready", "completed"] as const;
+
+  const getStageIndex = (status?: string) => {
+    const stageIndex = orderStages.indexOf(
+      (status as (typeof orderStages)[number]) || "pending"
+    );
+
+    return stageIndex === -1 ? 0 : stageIndex;
+  };
+
   if (!isAuthLoading && !user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-cream to-white px-4 pb-20 pt-24">
@@ -105,7 +115,7 @@ function OrdersPage() {
             Track your recent chai runs
           </h1>
           <p className="mt-2 text-muted-foreground">
-            Live updates appear here whenever your order status changes.
+            Live updates appear here whenever your order status changes, so users can follow the flow more clearly.
           </p>
         </motion.div>
 
@@ -170,6 +180,33 @@ function OrdersPage() {
                     </div>
                   ))}
                 </div>
+
+                {order.status !== "cancelled" && (
+                  <div className="mt-5 rounded-xl border border-orange-100 bg-orange-50/60 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-saffron-dark">
+                      Order Tracking
+                    </p>
+                    <div className="mt-4 grid gap-3 sm:grid-cols-4">
+                      {orderStages.map((stage, index) => {
+                        const activeIndex = getStageIndex(order.status);
+                        const isActive = index <= activeIndex;
+
+                        return (
+                          <div
+                            key={`${order.id}-${stage}`}
+                            className={`rounded-xl border px-3 py-3 text-center text-xs font-medium uppercase tracking-[0.16em] ${
+                              isActive
+                                ? "border-saffron bg-white text-saffron-dark"
+                                : "border-orange-100 bg-white/70 text-muted-foreground"
+                            }`}
+                          >
+                            {stage}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 {order.special_instructions && (
                   <div className="mt-5 rounded-xl border border-dashed border-orange-200 bg-orange-50/70 px-4 py-3 text-sm text-orange-950">

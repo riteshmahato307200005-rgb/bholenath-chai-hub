@@ -18,6 +18,10 @@ export interface Order {
   status?: "pending" | "preparing" | "ready" | "completed" | "cancelled";
   special_instructions?: string;
   order_type?: "dine-in" | "takeaway" | "delivery";
+  payment_method?: "cash" | "online";
+  payment_status?: "created" | "authorized" | "captured" | "failed" | "pending";
+  razorpay_order_id?: string | null;
+  razorpay_payment_id?: string | null;
   created_at?: string;
   updated_at?: string;
 }

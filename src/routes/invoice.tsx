@@ -20,11 +20,10 @@ function InvoicePage() {
       <div className="min-h-screen bg-gradient-to-b from-cream to-white px-4 pb-20 pt-24">
         <div className="mx-auto max-w-2xl rounded-3xl bg-white p-8 text-center shadow-lg">
           <h1 className="text-3xl font-heading font-bold text-chai-brown">
-            Invoice not found
+            Receipt not found
           </h1>
           <p className="mt-4 text-muted-foreground">
-            Complete an online payment first, then your invoice will appear
-            here.
+            Place an order first, then your receipt will appear here.
           </p>
           <Button asChild className="mt-6 bg-gradient-saffron text-white">
             <Link to="/menu">Back to menu</Link>
@@ -44,13 +43,13 @@ function InvoicePage() {
         <div className="flex flex-col gap-4 border-b border-border pb-6 md:flex-row md:items-start md:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.3em] text-saffron-dark">
-              Payment invoice
+              Order receipt
             </p>
             <h1 className="mt-2 font-heading text-4xl font-bold text-chai-brown">
               Bholenath Chai Hub
             </h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Thank you for your payment. Keep this invoice for your records.
+              Keep this receipt for your order and payment reference.
             </p>
           </div>
 
@@ -62,10 +61,12 @@ function InvoicePage() {
             <p className="mt-2">
               <span className="font-semibold">Order ID:</span> {invoice.orderId}
             </p>
-            <p className="mt-2">
-              <span className="font-semibold">Payment ID:</span>{" "}
-              {invoice.paymentId}
-            </p>
+            {invoice.paymentId ? (
+              <p className="mt-2">
+                <span className="font-semibold">Payment ID:</span>{" "}
+                {invoice.paymentId}
+              </p>
+            ) : null}
             <p className="mt-2">
               <span className="font-semibold">Date:</span>{" "}
               {new Date(invoice.createdAt).toLocaleString("en-IN")}
@@ -99,10 +100,10 @@ function InvoicePage() {
               Method: {invoice.paymentMethod}
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Status: Paid successfully
+              Status: {invoice.paymentStatus || "Recorded"}
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Total paid: Rs. {invoice.totalAmount}
+              Total amount: Rs. {invoice.totalAmount}
             </p>
           </div>
         </div>
@@ -141,7 +142,9 @@ function InvoicePage() {
         <div className="mt-6 flex flex-col gap-4 border-t border-border pt-6 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm text-muted-foreground">
-              This invoice confirms a successful Razorpay payment.
+              {invoice.paymentMethod === "Cash"
+                ? "Show this receipt at the counter while paying for your order."
+                : "This receipt confirms your online payment and order details."}
             </p>
             <p className="mt-1 text-lg font-bold text-chai-brown">
               Grand Total: Rs. {invoice.totalAmount}

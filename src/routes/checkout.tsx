@@ -158,7 +158,7 @@ function CheckoutPage() {
   };
 
   const submitCashOrder = async () => {
-    await placeCashOrderFn({
+    const cashOrderResult = await placeCashOrderFn({
       data: {
         customer_name: formData.name.trim(),
         customer_email: formData.email.trim(),
@@ -175,14 +175,35 @@ function CheckoutPage() {
       },
     });
 
+    saveInvoice({
+      invoiceId: `INV-${Date.now()}`,
+      orderId: cashOrderResult.orderId,
+      customerName: formData.name.trim(),
+      customerEmail: formData.email.trim(),
+      customerPhone: formData.phone.replace(/\D/g, ""),
+      address: formData.address.trim(),
+      notes: formData.instructions.trim(),
+      items: cartItems.map((item) => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        image: item.image,
+      })),
+      totalAmount,
+      paymentMethod: "Cash",
+      paymentStatus: "Pay at counter",
+      createdAt: new Date().toISOString(),
+    });
+
     setSubmitStatus({
       type: "success",
-      message: "Order placed successfully. Please pay at the counter.",
+      message: "Order placed successfully. Your receipt is ready.",
     });
 
     clearCart();
     window.setTimeout(() => {
-      navigate({ to: "/" });
+      navigate({ to: "/invoice" });
     }, 1800);
   };
 
@@ -300,6 +321,7 @@ function CheckoutPage() {
             })),
             totalAmount,
             paymentMethod: "Razorpay",
+            paymentStatus: "Paid successfully",
             createdAt: new Date().toISOString(),
           });
 

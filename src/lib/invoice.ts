@@ -8,7 +8,7 @@ export type InvoiceItem = {
 export type InvoiceData = {
   invoiceId: string;
   orderId: string;
-  paymentId: string;
+  paymentId?: string;
   customerName: string;
   customerEmail: string;
   customerPhone: string;
@@ -17,6 +17,7 @@ export type InvoiceData = {
   items: InvoiceItem[];
   totalAmount: number;
   paymentMethod: string;
+  paymentStatus?: string;
   createdAt: string;
 };
 

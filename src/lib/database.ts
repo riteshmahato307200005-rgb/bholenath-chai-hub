@@ -115,6 +115,60 @@ export async function fetchOrdersRealTime(
   }
 }
 
+export async function fetchCustomerOrdersRealTime(
+  customerEmail: string,
+  callback: (orders: Order[]) => void
+) {
+  const supabase = createSupabaseClient();
+
+  if (!supabase) {
+    console.log("Demo mode: No Supabase client");
+    return;
+  }
+
+  try {
+    const normalizedEmail = customerEmail.trim().toLowerCase();
+
+    const loadOrders = async () => {
+      const { data, error } = await supabase
+        .from("orders")
+        .select("*")
+        .eq("customer_email", normalizedEmail)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching customer orders:", error);
+        return;
+      }
+
+      callback(data || []);
+    };
+
+    await loadOrders();
+
+    const subscription = supabase
+      .channel(`customer-orders-${normalizedEmail}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "orders",
+        },
+        () => {
+          void loadOrders();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(subscription);
+    };
+  } catch (error) {
+    console.error("Customer order subscription error:", error);
+  }
+}
+
 /**
  * Submit a contact inquiry
  */

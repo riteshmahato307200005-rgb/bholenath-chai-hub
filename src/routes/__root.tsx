@@ -1,4 +1,5 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { AuthProvider } from "@/components/auth/AuthProvider";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Toaster } from "@/components/ui/sonner";
@@ -66,13 +67,13 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   return (
-    <>
+    <AuthProvider>
       <Navbar />
       <main>
         <Outlet />
       </main>
       <Footer />
       <Toaster position="top-right" richColors />
-    </>
+    </AuthProvider>
   );
 }

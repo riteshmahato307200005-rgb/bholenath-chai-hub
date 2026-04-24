@@ -1,7 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -77,6 +79,7 @@ export const Route = createFileRoute("/checkout")({
 function CheckoutPage() {
   const navigate = useNavigate();
   const cartItems = useCartSnapshot();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const createPaymentOrderFn = useServerFn(createPaymentOrder);
   const placeCashOrderFn = useServerFn(placeCashOrder);
   const verifyPaymentFn = useServerFn(verifyPayment);
@@ -93,6 +96,25 @@ function CheckoutPage() {
     type: null,
     message: "",
   });
+
+  useEffect(() => {
+    if (!user) return;
+
+    setFormData((current) => ({
+      ...current,
+      name:
+        current.name ||
+        (typeof user.user_metadata?.full_name === "string"
+          ? user.user_metadata.full_name
+          : ""),
+      email: current.email || user.email || "",
+      phone:
+        current.phone ||
+        (typeof user.user_metadata?.phone === "string"
+          ? user.user_metadata.phone
+          : ""),
+    }));
+  }, [user]);
 
   const totalAmount = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -347,6 +369,42 @@ function CheckoutPage() {
           >
             Browse menu
           </Button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (!isAuthLoading && !user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-cream to-white px-4 pb-20 pt-24">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-lg rounded-3xl border border-orange-100 bg-white p-8 text-center shadow-xl"
+        >
+          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-saffron-dark">
+            Login Required
+          </p>
+          <h1 className="mt-4 font-heading text-4xl font-bold text-chai-brown">
+            Sign in before checkout
+          </h1>
+          <p className="mt-3 text-muted-foreground">
+            We use login to prefill your details and keep your order history tied to your account.
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Link
+              to="/auth"
+              className="rounded-full bg-gradient-saffron px-6 py-3 text-sm font-semibold text-primary-foreground transition-transform hover:scale-105"
+            >
+              Login or Sign Up
+            </Link>
+            <Link
+              to="/cart"
+              className="rounded-full border border-border px-6 py-3 text-sm font-semibold text-foreground"
+            >
+              Back to Cart
+            </Link>
+          </div>
         </motion.div>
       </div>
     );

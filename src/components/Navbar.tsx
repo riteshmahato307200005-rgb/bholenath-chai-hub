@@ -1,6 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { Button } from "@/components/ui/button";
+import { getUserDisplayName } from "@/lib/auth";
 import { getCartCount } from "@/lib/cart-store";
 import logo from "@/assets/logo.png";
 
@@ -8,6 +12,7 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const { user, signOut, isConfigured } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -26,6 +31,22 @@ export function Navbar() {
     { to: "/contact" as const, label: "Contact" },
     { to: "/cart" as const, label: "Cart" },
   ];
+  const accountLinks = user ? [{ to: "/orders" as const, label: "My Orders" }] : [];
+
+  const userName = getUserDisplayName({
+    email: user?.email,
+    fullName: typeof user?.user_metadata?.full_name === "string" ? user.user_metadata.full_name : "",
+  });
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success("Logged out successfully");
+      setIsOpen(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Logout failed.");
+    }
+  };
 
   return (
     <motion.nav
@@ -50,7 +71,7 @@ export function Navbar() {
 
           {/* Desktop nav */}
           <div className="hidden items-center gap-8 md:flex">
-            {navLinks.map((link) => (
+            {[...navLinks, ...accountLinks].map((link) => (
               <Link
                 key={link.to}
                 to={link.to}
@@ -73,6 +94,30 @@ export function Navbar() {
             >
               Order Now
             </Link>
+            {isConfigured && user ? (
+              <div className="flex items-center gap-3">
+                <div className={`text-sm font-medium ${scrolled ? "text-accent-foreground" : "text-cream"}`}>
+                  Hi, {userName}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleSignOut}
+                  className="rounded-full border-white/30 bg-white/10 px-4 py-2 text-sm"
+                >
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <Link
+                to="/auth"
+                className={`text-sm font-semibold transition-colors hover:text-saffron ${
+                  scrolled ? "text-accent-foreground" : "text-cream"
+                }`}
+              >
+                Login
+              </Link>
+            )}
           </div>
 
           {/* Mobile hamburger */}
@@ -107,7 +152,7 @@ export function Navbar() {
             className="overflow-hidden bg-accent/95 backdrop-blur-md md:hidden"
           >
             <div className="flex flex-col gap-4 px-4 py-6">
-              {navLinks.map((link) => (
+              {[...navLinks, ...accountLinks].map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
@@ -125,6 +170,28 @@ export function Navbar() {
               >
                 Order Now
               </Link>
+              {isConfigured && user ? (
+                <>
+                  <div className="text-sm font-medium text-accent-foreground">
+                    Logged in as {userName}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleSignOut}
+                    className="rounded-full border border-border px-5 py-3 text-left text-sm font-semibold text-accent-foreground"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/auth"
+                  onClick={() => setIsOpen(false)}
+                  className="rounded-full border border-border px-5 py-3 text-center text-sm font-semibold text-accent-foreground"
+                >
+                  Login
+                </Link>
+              )}
             </div>
           </motion.div>
         )}

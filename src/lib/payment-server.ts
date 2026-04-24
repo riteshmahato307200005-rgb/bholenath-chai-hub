@@ -8,6 +8,7 @@ type OrderItem = {
   name: string;
   price: number;
   quantity: number;
+  image?: string;
 };
 
 type CreatePaymentOrderInput = {
@@ -128,7 +129,8 @@ function isValidItems(items: unknown): items is OrderItem[] {
         typeof item.id === "string" &&
         typeof item.name === "string" &&
         typeof item.price === "number" &&
-        typeof item.quantity === "number",
+        typeof item.quantity === "number" &&
+        (typeof item.image === "undefined" || typeof item.image === "string"),
     )
   );
 }

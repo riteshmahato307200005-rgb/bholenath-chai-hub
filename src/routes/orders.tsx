@@ -5,6 +5,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { fetchCustomerOrdersRealTime, type Order } from "@/lib/database";
+import { menuItems } from "@/lib/menu-data";
 
 export const Route = createFileRoute("/orders")({
   head: () => ({
@@ -18,17 +19,18 @@ export const Route = createFileRoute("/orders")({
 
 function OrdersPage() {
   const { user, isLoading: isAuthLoading } = useAuth();
+  const userEmail = user?.email ?? null;
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!user?.email) return;
+    if (!userEmail) return;
 
     setIsLoading(true);
     let unsubscribe: (() => void) | undefined;
 
     const setup = async () => {
-      unsubscribe = await fetchCustomerOrdersRealTime(user.email, (nextOrders) => {
+      unsubscribe = await fetchCustomerOrdersRealTime(userEmail, (nextOrders) => {
         setOrders(nextOrders);
         setIsLoading(false);
       });
@@ -39,7 +41,7 @@ function OrdersPage() {
     return () => {
       if (unsubscribe) unsubscribe();
     };
-  }, [user?.email]);
+  }, [userEmail]);
 
   const getStatusColor = (status?: string) => {
     switch (status) {
@@ -59,6 +61,7 @@ function OrdersPage() {
   };
 
   const orderStages = ["pending", "preparing", "ready", "completed"] as const;
+  const menuItemById = new Map(menuItems.map((item) => [item.id, item]));
 
   const getStageIndex = (status?: string) => {
     const stageIndex = orderStages.indexOf(
@@ -66,6 +69,11 @@ function OrdersPage() {
     );
 
     return stageIndex === -1 ? 0 : stageIndex;
+  };
+
+  const getItemImage = (item: Order["items"][number]) => {
+    if (item.image) return item.image;
+    return menuItemById.get(item.id)?.image;
   };
 
   if (!isAuthLoading && !user) {
@@ -171,11 +179,30 @@ function OrdersPage() {
                   {order.items.map((item) => (
                     <div
                       key={`${order.id}-${item.id}`}
-                      className="rounded-xl bg-secondary/40 px-4 py-3 text-sm"
+                      className="flex items-center gap-3 rounded-xl border border-orange-100 bg-secondary/30 px-4 py-3 text-sm"
                     >
-                      <div className="font-medium text-foreground">{item.name}</div>
-                      <div className="text-muted-foreground">
-                        Qty {item.quantity} x Rs. {item.price}
+                      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-white ring-1 ring-orange-100">
+                        {getItemImage(item) ? (
+                          <img
+                            src={getItemImage(item)}
+                            alt={item.name}
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-xs font-semibold uppercase tracking-[0.18em] text-saffron-dark">
+                            Chai
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate font-medium text-foreground">{item.name}</div>
+                        <div className="text-muted-foreground">
+                          Qty {item.quantity} x Rs. {item.price}
+                        </div>
+                        <div className="mt-1 text-sm font-semibold text-chai-brown">
+                          Rs. {item.quantity * item.price}
+                        </div>
                       </div>
                     </div>
                   ))}

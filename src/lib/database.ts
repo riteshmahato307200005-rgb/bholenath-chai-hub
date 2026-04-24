@@ -6,6 +6,7 @@ interface OrderItem {
   name: string;
   price: number;
   quantity: number;
+  image?: string;
 }
 
 export interface Order {
@@ -553,7 +554,7 @@ export async function verifyAndCreateOrder(
     console.log("✅ Payment verified!");
 
     // Now create order in Supabase
-    const orderWithPayment = {
+    const orderWithPayment: Order = {
       ...orderData,
       special_instructions: `Payment: Online (Razorpay) | Payment ID: ${paymentData.razorpay_payment_id} | ${orderData.special_instructions || ""}`,
       status: "pending",

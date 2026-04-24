@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -13,6 +13,10 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const { user, signOut, isConfigured } = useAuth();
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
+  const useSolidNavbar = scrolled || pathname !== "/";
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -53,7 +57,7 @@ export function Navbar() {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
+        useSolidNavbar
           ? "bg-accent/95 backdrop-blur-md shadow-lg"
           : "bg-transparent"
       }`}
@@ -65,7 +69,7 @@ export function Navbar() {
             <img src={logo} alt="Bholenath Chai" className="h-8 w-8 md:h-10 md:w-10" width={40} height={40} />
             <span className="text-xl font-bold font-heading md:text-2xl">
               <span className="text-saffron">Bholenath</span>
-              <span className={scrolled ? "text-accent-foreground" : "text-cream"}> Chai</span>
+              <span className={useSolidNavbar ? "text-accent-foreground" : "text-cream"}> Chai</span>
             </span>
           </Link>
 
@@ -75,10 +79,16 @@ export function Navbar() {
               <Link
                 key={link.to}
                 to={link.to}
-                className={`text-sm font-medium transition-colors hover:text-saffron ${
-                  scrolled ? "text-accent-foreground" : "text-cream"
+                className={`rounded-full px-3 py-2 text-sm font-medium transition-all hover:text-saffron ${
+                  useSolidNavbar
+                    ? "text-accent-foreground/85 hover:bg-white/55"
+                    : "text-cream/90 hover:bg-white/8"
                 }`}
-                activeProps={{ className: "!text-saffron" }}
+                activeProps={{
+                  className: useSolidNavbar
+                    ? "!bg-white !text-saffron shadow-sm"
+                    : "!bg-white/14 !text-saffron-light backdrop-blur-sm",
+                }}
               >
                 {link.label}
                 {link.label === "Cart" && cartCount > 0 && (
@@ -96,14 +106,18 @@ export function Navbar() {
             </Link>
             {isConfigured && user ? (
               <div className="flex items-center gap-3">
-                <div className={`text-sm font-medium ${scrolled ? "text-accent-foreground" : "text-cream"}`}>
+                <div className={`text-sm font-medium ${useSolidNavbar ? "text-accent-foreground" : "text-cream"}`}>
                   Hi, {userName}
                 </div>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={handleSignOut}
-                  className="rounded-full border-white/30 bg-white/10 px-4 py-2 text-sm"
+                  className={`rounded-full px-4 py-2 text-sm ${
+                    useSolidNavbar
+                      ? "border-border bg-white/70 text-accent-foreground hover:bg-white"
+                      : "border-white/30 bg-white/10 text-cream"
+                  }`}
                 >
                   Logout
                 </Button>
@@ -111,8 +125,10 @@ export function Navbar() {
             ) : (
               <Link
                 to="/auth"
-                className={`text-sm font-semibold transition-colors hover:text-saffron ${
-                  scrolled ? "text-accent-foreground" : "text-cream"
+                className={`rounded-full px-3 py-2 text-sm font-semibold transition-all hover:text-saffron ${
+                  useSolidNavbar
+                    ? "text-accent-foreground/85 hover:bg-white/55"
+                    : "text-cream/90 hover:bg-white/8"
                 }`}
               >
                 Login
@@ -123,7 +139,7 @@ export function Navbar() {
           {/* Mobile hamburger */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className={`flex flex-col gap-1.5 md:hidden ${scrolled ? "text-accent-foreground" : "text-cream"}`}
+            className={`flex flex-col gap-1.5 md:hidden ${useSolidNavbar ? "text-accent-foreground" : "text-cream"}`}
             aria-label="Toggle menu"
           >
             <motion.span
@@ -157,7 +173,8 @@ export function Navbar() {
                   key={link.to}
                   to={link.to}
                   onClick={() => setIsOpen(false)}
-                  className="text-lg font-medium text-accent-foreground transition-colors hover:text-saffron"
+                  className="rounded-full px-5 py-3 text-lg font-medium text-accent-foreground transition-colors hover:bg-white/70 hover:text-saffron"
+                  activeProps={{ className: "!bg-white !text-saffron" }}
                 >
                   {link.label}
                   {link.label === "Cart" && cartCount > 0 && ` (${cartCount})`}

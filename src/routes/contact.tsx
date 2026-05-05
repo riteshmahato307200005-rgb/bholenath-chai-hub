@@ -96,7 +96,7 @@ function ContactPage() {
                   <div>
                     <h3 className="font-heading font-semibold text-foreground">Follow Us</h3>
                     <p className="text-sm text-muted-foreground">
-                      Instagram: @bholenathchai
+                      Instagram: @sipnsnackstories_
                     </p>
                   </div>
                 </div>

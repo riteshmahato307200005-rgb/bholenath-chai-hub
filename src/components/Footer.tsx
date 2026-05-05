@@ -58,7 +58,7 @@ export function Footer() {
             <ul className="mt-4 space-y-2 text-sm text-cream/70">
               <li>📞 +91 98765 43210</li>
               <li>✉️ hello@bholenathchai.com</li>
-              <li>📱 @bholenathchai</li>
+              <li>📱 @sipnsnackstories_</li>
               <li className="pt-2">
                 🕐 Mon-Sat: 7 AM – 8 PM
               </li>

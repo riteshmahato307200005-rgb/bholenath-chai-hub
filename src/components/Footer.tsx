@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Instagram } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 export function Footer() {
@@ -58,7 +59,18 @@ export function Footer() {
             <ul className="mt-4 space-y-2 text-sm text-cream/70">
               <li>📞 +91 98765 43210</li>
               <li>✉️ hello@bholenathchai.com</li>
-              <li>📱 @sipnsnackstories_</li>
+              <li>
+                <a
+                  href="https://www.instagram.com/sipnsnackstories_/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 transition-colors hover:text-saffron"
+                  aria-label="Open Sip N Snack Stories on Instagram"
+                >
+                  <Instagram className="h-4 w-4" aria-hidden="true" />
+                  @sipnsnackstories_
+                </a>
+              </li>
               <li className="pt-2">
                 🕐 Mon-Sat: 7 AM – 8 PM
               </li>

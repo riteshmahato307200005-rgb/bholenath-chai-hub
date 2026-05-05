@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { Instagram } from "lucide-react";
 import { ContactForm } from "@/components/ContactForm";
 
 export const Route = createFileRoute("/contact")({
@@ -92,12 +93,25 @@ function ContactPage() {
                 </div>
 
                 <div className="flex gap-4">
-                  <span className="mt-1 text-2xl">📱</span>
+                  <a
+                    href="https://www.instagram.com/sipnsnackstories_/"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full bg-saffron/10 text-saffron transition-colors hover:bg-saffron hover:text-primary-foreground"
+                    aria-label="Open Sip N Snack Stories on Instagram"
+                  >
+                    <Instagram className="h-5 w-5" aria-hidden="true" />
+                  </a>
                   <div>
                     <h3 className="font-heading font-semibold text-foreground">Follow Us</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <a
+                      href="https://www.instagram.com/sipnsnackstories_/"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm font-medium text-muted-foreground transition-colors hover:text-saffron"
+                    >
                       Instagram: @sipnsnackstories_
-                    </p>
+                    </a>
                   </div>
                 </div>
               </div>

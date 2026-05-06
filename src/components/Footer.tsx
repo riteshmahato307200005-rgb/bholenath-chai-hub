@@ -47,7 +47,8 @@ export function Footer() {
           <div>
             <h4 className="font-heading text-lg font-semibold text-saffron">Find Us</h4>
             <ul className="mt-4 space-y-2 text-sm text-cream/70">
-              <li>📍 KJ College Campus, Near Main Gate</li>
+              <li>📍 Parking Area, Near Brew Beans Cafe</li>
+              <li>KJ College Campus</li>
               <li>Yewalewadi, Pune - 411048</li>
               <li>Maharashtra, India</li>
             </ul>

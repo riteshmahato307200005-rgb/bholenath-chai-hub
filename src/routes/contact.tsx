@@ -5,7 +5,10 @@ import { useEffect, useState } from "react";
 import { ContactForm } from "@/components/ContactForm";
 
 const mapsDirectionsUrl =
-  "https://www.google.com/maps/dir/?api=1&destination=KJ%20College%20Campus%2C%20Yewalewadi%2C%20Pune%20411048";
+  "https://www.google.com/maps/dir/?api=1&destination=Brew%20Beans%20Cafe%20Parking%2C%20KJ%20College%20Campus%2C%20Yewalewadi%2C%20Pune%20411048";
+
+const mapEmbedUrl =
+  "https://www.google.com/maps?q=Brew%20Beans%20Cafe%20Parking%2C%20KJ%20College%20Campus%2C%20Yewalewadi%2C%20Pune%20411048&z=17&output=embed";
 
 function getStoreStatus() {
   const nowInIndia = new Date(
@@ -29,9 +32,9 @@ export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact Us — Bholenath Chai & Snacks Center" },
-      { name: "description", content: "Find us at KJ College, Yewalewadi, Pune. Visit our chai stall on campus or reach out for bulk orders and event catering." },
+      { name: "description", content: "Find us in the parking area near Brew Beans Cafe at KJ College, Yewalewadi, Pune." },
       { property: "og:title", content: "Contact — Bholenath Chai & Snacks Center" },
-      { property: "og:description", content: "Located at KJ College campus, Yewalewadi, Pune. Come grab your daily chai!" },
+      { property: "og:description", content: "Located in the parking area near Brew Beans Cafe at KJ College campus. Come grab your daily chai!" },
     ],
   }),
   component: ContactPage,
@@ -107,7 +110,8 @@ function ContactPage() {
                     <h3 className="font-heading font-semibold text-foreground">Address</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
                       Bholenath Chai & Snacks Center<br />
-                      KJ College Campus, Near Main Gate<br />
+                      Parking Area, Near Brew Beans Cafe<br />
+                      KJ College Campus<br />
                       Yewalewadi, Pune - 411048<br />
                       Maharashtra, India
                     </p>
@@ -197,14 +201,14 @@ function ContactPage() {
                 className="mt-8 overflow-hidden rounded-2xl shadow-chai"
               >
                 <iframe
-                  src="https://www.google.com/maps?q=KJ%20College%20Campus%2C%20Yewalewadi%2C%20Pune%20411048&z=16&output=embed"
+                  src={mapEmbedUrl}
                   width="100%"
                   height="300"
                   style={{ border: 0 }}
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="Bholenath Chai Location - KJ College Yewalewadi"
+                  title="Bholenath Chai Location - Parking near Brew Beans Cafe"
                 />
               </motion.div>
               <a

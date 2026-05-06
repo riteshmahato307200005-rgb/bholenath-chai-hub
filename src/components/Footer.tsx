@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram } from "lucide-react";
+import { Instagram, Mail } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 export function Footer() {
@@ -58,7 +58,16 @@ export function Footer() {
             <h4 className="font-heading text-lg font-semibold text-saffron">Contact</h4>
             <ul className="mt-4 space-y-2 text-sm text-cream/70">
               <li>📞 +91 98765 43210</li>
-              <li>✉️ hello@bholenathchai.com</li>
+              <li>
+                <a
+                  href="mailto:bholenathchaiandsnackscenter@gmail.com"
+                  className="inline-flex items-center gap-2 transition-colors hover:text-saffron"
+                  aria-label="Email Bholenath Chai and Snacks Center"
+                >
+                  <Mail className="h-4 w-4" aria-hidden="true" />
+                  bholenathchaiandsnackscenter@gmail.com
+                </a>
+              </li>
               <li>
                 <a
                   href="https://www.instagram.com/sipnsnackstories_/"

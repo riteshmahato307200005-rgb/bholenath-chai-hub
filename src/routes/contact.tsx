@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { Instagram } from "lucide-react";
+import { Instagram, Mail } from "lucide-react";
 import { ContactForm } from "@/components/ContactForm";
 
 export const Route = createFileRoute("/contact")({
@@ -74,10 +74,21 @@ function ContactPage() {
                 </div>
 
                 <div className="flex gap-4">
-                  <span className="mt-1 text-2xl">✉️</span>
+                  <a
+                    href="mailto:bholenathchaiandsnackscenter@gmail.com"
+                    className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full bg-saffron/10 text-saffron transition-colors hover:bg-saffron hover:text-primary-foreground"
+                    aria-label="Email Bholenath Chai and Snacks Center"
+                  >
+                    <Mail className="h-5 w-5" aria-hidden="true" />
+                  </a>
                   <div>
                     <h3 className="font-heading font-semibold text-foreground">Email</h3>
-                    <p className="text-sm text-muted-foreground">hello@bholenathchai.com</p>
+                    <a
+                      href="mailto:bholenathchaiandsnackscenter@gmail.com"
+                      className="text-sm font-medium text-muted-foreground transition-colors hover:text-saffron"
+                    >
+                      bholenathchaiandsnackscenter@gmail.com
+                    </a>
                   </div>
                 </div>
 

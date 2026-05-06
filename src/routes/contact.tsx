@@ -1,7 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { Instagram, Mail } from "lucide-react";
+import { Clock, Instagram, Mail, MapPin, Navigation } from "lucide-react";
+import { useEffect, useState } from "react";
 import { ContactForm } from "@/components/ContactForm";
+
+const mapsDirectionsUrl =
+  "https://www.google.com/maps/dir/?api=1&destination=KJ%20College%20Campus%2C%20Yewalewadi%2C%20Pune%20411048";
+
+function getStoreStatus() {
+  const nowInIndia = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+  );
+  const day = nowInIndia.getDay();
+  const minutes = nowInIndia.getHours() * 60 + nowInIndia.getMinutes();
+  const opensAt = day === 0 ? 8 * 60 : 7 * 60;
+  const closesAt = day === 0 ? 18 * 60 : 20 * 60;
+  const isOpen = minutes >= opensAt && minutes < closesAt;
+
+  return {
+    isOpen,
+    message: isOpen
+      ? `Open now until ${day === 0 ? "6:00 PM" : "8:00 PM"}`
+      : `Closed now. Opens ${day === 0 ? "Monday at 7:00 AM" : "at 7:00 AM"}`,
+  };
+}
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -16,6 +38,17 @@ export const Route = createFileRoute("/contact")({
 });
 
 function ContactPage() {
+  const [storeStatus, setStoreStatus] = useState(getStoreStatus);
+
+  useEffect(() => {
+    const updateStatus = () => setStoreStatus(getStoreStatus());
+
+    updateStatus();
+    const intervalId = window.setInterval(updateStatus, 60_000);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
   return (
     <div className="pt-20">
       {/* Header */}
@@ -61,7 +94,15 @@ function ContactPage() {
 
               <div className="mt-8 space-y-6">
                 <div className="flex gap-4">
-                  <span className="mt-1 text-2xl">📍</span>
+                  <a
+                    href={mapsDirectionsUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full bg-saffron/10 text-saffron transition-colors hover:bg-saffron hover:text-primary-foreground"
+                    aria-label="Get directions to Bholenath Chai and Snacks Center"
+                  >
+                    <MapPin className="h-5 w-5" aria-hidden="true" />
+                  </a>
                   <div>
                     <h3 className="font-heading font-semibold text-foreground">Address</h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
@@ -70,6 +111,15 @@ function ContactPage() {
                       Yewalewadi, Pune - 411048<br />
                       Maharashtra, India
                     </p>
+                    <a
+                      href={mapsDirectionsUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-2 inline-flex items-center gap-2 text-sm font-semibold text-saffron-dark transition-colors hover:text-saffron"
+                    >
+                      <Navigation className="h-4 w-4" aria-hidden="true" />
+                      Get directions
+                    </a>
                   </div>
                 </div>
 
@@ -93,9 +143,24 @@ function ContactPage() {
                 </div>
 
                 <div className="flex gap-4">
-                  <span className="mt-1 text-2xl">🕐</span>
+                  <span
+                    className={`mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full ${
+                      storeStatus.isOpen
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}
+                  >
+                    <Clock className="h-5 w-5" aria-hidden="true" />
+                  </span>
                   <div>
                     <h3 className="font-heading font-semibold text-foreground">Hours</h3>
+                    <p
+                      className={`text-sm font-semibold ${
+                        storeStatus.isOpen ? "text-green-700" : "text-red-700"
+                      }`}
+                    >
+                      {storeStatus.message}
+                    </p>
                     <p className="text-sm text-muted-foreground">
                       Monday – Saturday: 7:00 AM – 8:00 PM<br />
                       Sunday: 8:00 AM – 6:00 PM
@@ -143,12 +208,13 @@ function ContactPage() {
                 />
               </motion.div>
               <a
-                href="https://www.google.com/maps/search/?api=1&query=KJ%20College%20Campus%2C%20Yewalewadi%2C%20Pune%20411048"
+                href={mapsDirectionsUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-3 inline-flex text-sm font-semibold text-saffron-dark hover:text-saffron"
+                className="mt-4 inline-flex items-center gap-2 rounded-full bg-gradient-saffron px-5 py-3 text-sm font-semibold text-primary-foreground shadow-chai transition-transform hover:scale-[1.02]"
               >
-                Open in Google Maps
+                <Navigation className="h-4 w-4" aria-hidden="true" />
+                Get Directions on Google Maps
               </a>
             </motion.div>
 

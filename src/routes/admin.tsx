@@ -221,6 +221,11 @@ function AdminPage() {
     }
   };
 
+  const getPickupTime = (order: Order) => {
+    const pickupMatch = order.special_instructions?.match(/Pickup:\s*([^|]+)/i);
+    return pickupMatch?.[1]?.trim() || "ASAP";
+  };
+
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-chai-brown to-saffron flex items-center justify-center p-4">
@@ -293,6 +298,22 @@ function AdminPage() {
             {error}
           </div>
         )}
+
+        <div className="mb-6 flex flex-wrap items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
+          <span className="font-semibold">Sound alerts are on.</span>
+          <span className="text-green-700">
+            Keep this dashboard open to hear new-order alerts.
+          </span>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => void playNotificationSound()}
+            className="border-green-300 bg-white text-green-800 hover:bg-green-100"
+          >
+            Test Sound
+          </Button>
+        </div>
 
         <div className="grid gap-4 sm:grid-cols-4 mb-8">
           {[
@@ -401,6 +422,9 @@ function AdminPage() {
                       Type
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-semibold">
+                      Pickup
+                    </th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold">
                       Time
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-semibold">
@@ -464,6 +488,9 @@ function AdminPage() {
                         <Badge variant="outline">
                           {order.order_type || "dine-in"}
                         </Badge>
+                      </td>
+                      <td className="px-4 py-3 text-sm font-semibold text-chai-brown">
+                        {getPickupTime(order)}
                       </td>
                       <td className="px-4 py-3 text-sm text-muted-foreground">
                         {order.created_at

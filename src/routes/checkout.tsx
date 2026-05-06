@@ -18,6 +18,13 @@ import {
 
 type PaymentMethod = "cash" | "online";
 
+const pickupOptions = [
+  { value: "ASAP", label: "ASAP", detail: "Start preparing right away" },
+  { value: "10 min", label: "In 10 min", detail: "Good for a short break" },
+  { value: "20 min", label: "In 20 min", detail: "Collect after class change" },
+  { value: "After lecture", label: "After lecture", detail: "We will keep it ready" },
+];
+
 type PaymentStatus = {
   type: "success" | "error" | null;
   message: string;
@@ -89,6 +96,7 @@ function CheckoutPage() {
     phone: "",
     address: "",
     instructions: "",
+    pickupTime: "ASAP",
   });
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
   const [isLoading, setIsLoading] = useState(false);
@@ -142,6 +150,8 @@ function CheckoutPage() {
   const buildSpecialInstructions = (paymentLabel: string, extra?: string) => {
     const details = [paymentLabel];
 
+    details.push(`Pickup: ${formData.pickupTime}`);
+
     if (formData.address.trim()) {
       details.push(`Address: ${formData.address.trim()}`);
     }
@@ -182,7 +192,9 @@ function CheckoutPage() {
       customerEmail: formData.email.trim(),
       customerPhone: formData.phone.replace(/\D/g, ""),
       address: formData.address.trim(),
-      notes: formData.instructions.trim(),
+      notes: [formData.pickupTime && `Pickup: ${formData.pickupTime}`, formData.instructions.trim()]
+        .filter(Boolean)
+        .join(" | "),
       items: cartItems.map((item) => ({
         id: item.id,
         name: item.name,
@@ -311,7 +323,9 @@ function CheckoutPage() {
             customerEmail: formData.email.trim(),
             customerPhone: formData.phone.replace(/\D/g, ""),
             address: formData.address.trim(),
-            notes: formData.instructions.trim(),
+            notes: [formData.pickupTime && `Pickup: ${formData.pickupTime}`, formData.instructions.trim()]
+              .filter(Boolean)
+              .join(" | "),
             items: cartItems.map((item) => ({
               id: item.id,
               name: item.name,
@@ -508,6 +522,44 @@ function CheckoutPage() {
                   />
                 </div>
 
+                <div>
+                  <Label className="mb-3 block text-lg font-semibold">
+                    Pickup Time
+                  </Label>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {pickupOptions.map((option) => (
+                      <label
+                        key={option.value}
+                        className="flex cursor-pointer items-start rounded-lg border-2 p-4 transition-all"
+                        style={{
+                          borderColor:
+                            formData.pickupTime === option.value
+                              ? "#d4af37"
+                              : "#e5e7eb",
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          name="pickupTime"
+                          value={option.value}
+                          checked={formData.pickupTime === option.value}
+                          onChange={() => setField("pickupTime", option.value)}
+                          className="mt-1 h-4 w-4"
+                          disabled={isLoading}
+                        />
+                        <span className="ml-3">
+                          <span className="block font-semibold text-foreground">
+                            {option.label}
+                          </span>
+                          <span className="block text-sm text-muted-foreground">
+                            {option.detail}
+                          </span>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="border-t pt-4">
                   <Label className="mb-3 block text-lg font-semibold">
                     Payment Method *
@@ -635,6 +687,12 @@ function CheckoutPage() {
                 <span className="font-semibold">Total:</span>
                 <span className="text-xl font-bold text-saffron">
                   Rs. {totalAmount}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>Pickup:</span>
+                <span className="font-semibold text-foreground">
+                  {formData.pickupTime}
                 </span>
               </div>
             </div>

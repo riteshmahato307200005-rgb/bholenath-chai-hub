@@ -212,6 +212,11 @@ export function AdminSection() {
     }
   };
 
+  const getPickupTime = (order: Order) => {
+    const pickupMatch = order.special_instructions?.match(/Pickup:\s*([^|]+)/i);
+    return pickupMatch?.[1]?.trim() || "ASAP";
+  };
+
   const totalRevenue = orders.reduce((sum, order) => sum + order.total_amount, 0);
 
   return (
@@ -337,6 +342,22 @@ export function AdminSection() {
                     </div>
                   )}
 
+                  <div className="mb-6 flex flex-wrap items-center gap-3 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
+                    <span className="font-semibold">Sound alerts are on.</span>
+                    <span className="text-green-700">
+                      Keep this panel open to hear new-order alerts.
+                    </span>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => void playNotificationSound()}
+                      className="border-green-300 bg-white text-green-800 hover:bg-green-100"
+                    >
+                      Test Sound
+                    </Button>
+                  </div>
+
                   {/* Stats */}
                   <div className="grid gap-4 grid-cols-2 sm:grid-cols-4 mb-8">
                     {[
@@ -440,6 +461,7 @@ export function AdminSection() {
                               <th className="px-4 py-3 text-left font-semibold">ID</th>
                               <th className="px-4 py-3 text-left font-semibold">Customer</th>
                               <th className="px-4 py-3 text-left font-semibold">Items</th>
+                              <th className="px-4 py-3 text-left font-semibold">Pickup</th>
                               <th className="px-4 py-3 text-left font-semibold">Total</th>
                               <th className="px-4 py-3 text-left font-semibold">Status</th>
                               <th className="px-4 py-3 text-center font-semibold">Action</th>
@@ -468,6 +490,9 @@ export function AdminSection() {
                                       {item.name} x{item.quantity}
                                     </div>
                                   ))}
+                                </td>
+                                <td className="px-4 py-3 font-semibold text-chai-brown">
+                                  {getPickupTime(order)}
                                 </td>
                                 <td className="px-4 py-3 font-bold text-saffron">
                                   ₹{order.total_amount}

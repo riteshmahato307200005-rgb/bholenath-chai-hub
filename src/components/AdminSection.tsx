@@ -347,15 +347,6 @@ export function AdminSection() {
                     <span className="text-green-700">
                       Keep this panel open to hear new-order alerts.
                     </span>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => void playNotificationSound()}
-                      className="border-green-300 bg-white text-green-800 hover:bg-green-100"
-                    >
-                      Test Sound
-                    </Button>
                   </div>
 
                   {/* Stats */}

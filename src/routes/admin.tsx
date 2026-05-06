@@ -304,15 +304,6 @@ function AdminPage() {
           <span className="text-green-700">
             Keep this dashboard open to hear new-order alerts.
           </span>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={() => void playNotificationSound()}
-            className="border-green-300 bg-white text-green-800 hover:bg-green-100"
-          >
-            Test Sound
-          </Button>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-4 mb-8">

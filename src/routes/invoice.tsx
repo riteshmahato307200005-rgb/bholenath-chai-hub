@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { readInvoice, type InvoiceData } from "@/lib/invoice";
+import { formatOrderNumber } from "@/lib/order-format";
 
 export const Route = createFileRoute("/invoice")({
   component: InvoicePage,
@@ -59,7 +60,8 @@ function InvoicePage() {
               {invoice.invoiceId}
             </p>
             <p className="mt-2">
-              <span className="font-semibold">Order ID:</span> {invoice.orderId}
+              <span className="font-semibold">Order No:</span>{" "}
+              {formatOrderNumber(invoice.orderId, invoice.createdAt)}
             </p>
             {invoice.paymentId ? (
               <p className="mt-2">

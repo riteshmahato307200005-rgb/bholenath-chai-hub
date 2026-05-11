@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { fetchCustomerOrdersRealTime, type Order } from "@/lib/database";
 import { menuItems } from "@/lib/menu-data";
+import { formatOrderNumber } from "@/lib/order-format";
 
 export const Route = createFileRoute("/orders")({
   head: () => ({
@@ -156,7 +157,7 @@ function OrdersPage() {
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">
-                      Order #{order.id?.slice(0, 8)}
+                      Order {formatOrderNumber(order.id, order.created_at)}
                     </p>
                     <p className="mt-1 font-heading text-2xl font-bold text-chai-brown">
                       Rs. {order.total_amount}

@@ -19,6 +19,7 @@ import {
   updateOrderStatus,
   type Order,
 } from "@/lib/database";
+import { formatOrderNumber } from "@/lib/order-format";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -432,7 +433,7 @@ function AdminPage() {
                       className="border-b hover:bg-gray-50 transition-colors"
                     >
                       <td className="px-4 py-3 text-sm font-mono font-semibold">
-                        {order.id?.slice(0, 8)}
+                        {formatOrderNumber(order.id, order.created_at)}
                       </td>
                       <td className="px-4 py-3 text-sm">
                         <div>

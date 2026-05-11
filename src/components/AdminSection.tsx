@@ -17,6 +17,7 @@ import {
   deleteOrder,
   type Order,
 } from "@/lib/database";
+import { formatOrderNumber } from "@/lib/order-format";
 
 export function AdminSection() {
   const [isOpen, setIsOpen] = useState(false);
@@ -467,7 +468,7 @@ export function AdminSection() {
                                 className="border-b hover:bg-gray-50"
                               >
                                 <td className="px-4 py-3 font-mono text-xs">
-                                  {order.id?.slice(0, 8)}
+                                  {formatOrderNumber(order.id, order.created_at)}
                                 </td>
                                 <td className="px-4 py-3">
                                   <p className="font-medium">{order.customer_name}</p>

@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { PasswordInput } from "@/components/PasswordInput";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -248,8 +249,7 @@ function AdminPage() {
               <label className="block text-sm font-medium text-foreground mb-2">
                 Admin Password
               </label>
-              <Input
-                type="password"
+              <PasswordInput
                 placeholder="Enter admin password"
                 value={adminPassword}
                 onChange={(e) => setAdminPassword(e.target.value)}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { PasswordInput } from "@/components/PasswordInput";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -198,8 +199,7 @@ export function InquiriesSection() {
                         <label className="block text-sm font-medium text-foreground mb-2">
                           Password
                         </label>
-                        <Input
-                          type="password"
+                        <PasswordInput
                           placeholder="Enter password"
                           value={adminPassword}
                           onChange={(e) => setAdminPassword(e.target.value)}

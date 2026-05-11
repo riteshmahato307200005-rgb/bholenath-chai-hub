@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { PasswordInput } from "@/components/PasswordInput";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -167,9 +168,8 @@ function AuthPage() {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="login-password">Password</Label>
-                        <Input
+                        <PasswordInput
                           id="login-password"
-                          type="password"
                           placeholder="Enter your password"
                           value={loginForm.password}
                           onChange={(event) =>
@@ -235,9 +235,8 @@ function AuthPage() {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="signup-password">Password</Label>
-                        <Input
+                        <PasswordInput
                           id="signup-password"
-                          type="password"
                           placeholder="Minimum 6 characters"
                           value={signupForm.password}
                           onChange={(event) =>
@@ -251,9 +250,8 @@ function AuthPage() {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="signup-confirm-password">Confirm Password</Label>
-                        <Input
+                        <PasswordInput
                           id="signup-confirm-password"
-                          type="password"
                           placeholder="Re-enter your password"
                           value={signupForm.confirmPassword}
                           onChange={(event) =>

@@ -16,6 +16,7 @@ import {
   deleteInquiry,
   type Inquiry,
 } from "@/lib/database";
+import { validateOwnerLogin } from "@/lib/owner-auth";
 
 export function InquiriesSection() {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,10 +28,6 @@ export function InquiriesSection() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Same owner credentials as AdminSection
-  const OWNER_USERNAME = "owner";
-  const OWNER_PASSWORD = "bholenath123";
 
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -61,13 +58,15 @@ export function InquiriesSection() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (adminUsername === OWNER_USERNAME && adminPassword === OWNER_PASSWORD) {
+    const result = validateOwnerLogin(adminUsername, adminPassword, "inquiries");
+
+    if (result.ok) {
       setIsLoggedIn(true);
       setAdminUsername("");
       setAdminPassword("");
       setError(null);
     } else {
-      setError("❌ Invalid username or password");
+      setError(result.message);
       setAdminPassword("");
     }
   };

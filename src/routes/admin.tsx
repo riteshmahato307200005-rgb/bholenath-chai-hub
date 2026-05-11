@@ -20,6 +20,7 @@ import {
   type Order,
 } from "@/lib/database";
 import { formatOrderNumber } from "@/lib/order-format";
+import { validateOwnerLogin } from "@/lib/owner-auth";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -33,6 +34,7 @@ export const Route = createFileRoute("/admin")({
 
 function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [adminUsername, setAdminUsername] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
   const [orders, setOrders] = useState<Order[]>([]);
   const [filter, setFilter] = useState<string>("all");
@@ -42,8 +44,6 @@ function AdminPage() {
   const previousOrderIdsRef = useRef<Set<string>>(new Set());
   const hasLoadedInitialOrdersRef = useRef(false);
   const audioContextRef = useRef<AudioContext | null>(null);
-
-  const ADMIN_PASSWORD = "chai123";
 
   const playNotificationSound = async () => {
     try {
@@ -149,18 +149,23 @@ function AdminPage() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (adminPassword === ADMIN_PASSWORD) {
+    const result = validateOwnerLogin(adminUsername, adminPassword, "admin-page");
+
+    if (result.ok) {
       setIsLoggedIn(true);
+      setAdminUsername("");
       setAdminPassword("");
       setError(null);
       return;
     }
 
-    setError("Incorrect password");
+    setError(result.message);
+    setAdminPassword("");
   };
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+    setAdminUsername("");
     setAdminPassword("");
     setOrders([]);
     setError(null);
@@ -248,17 +253,29 @@ function AdminPage() {
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Admin Password
+                Owner Username
+              </label>
+              <Input
+                type="text"
+                placeholder="Enter owner username"
+                value={adminUsername}
+                onChange={(e) => setAdminUsername(e.target.value)}
+                className="w-full"
+                autoComplete="username"
+                autoFocus
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Owner Password
               </label>
               <PasswordInput
-                placeholder="Enter admin password"
+                placeholder="Enter owner password"
                 value={adminPassword}
                 onChange={(e) => setAdminPassword(e.target.value)}
                 className="w-full"
+                autoComplete="current-password"
               />
-              <p className="text-xs text-muted-foreground mt-2">
-                Demo: chai123
-              </p>
             </div>
             {error && <p className="text-sm text-red-600">{error}</p>}
             <Button

@@ -18,6 +18,7 @@ import {
   type Order,
 } from "@/lib/database";
 import { formatOrderNumber } from "@/lib/order-format";
+import { validateOwnerLogin } from "@/lib/owner-auth";
 
 export function AdminSection() {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,10 +33,6 @@ export function AdminSection() {
   const previousOrderIdsRef = useRef<Set<string>>(new Set());
   const hasLoadedInitialOrdersRef = useRef(false);
   const audioContextRef = useRef<AudioContext | null>(null);
-
-  // Default owner credentials (update these with your owner details)
-  const OWNER_USERNAME = "owner";
-  const OWNER_PASSWORD = "bholenath123";
 
   const playNotificationSound = async () => {
     try {
@@ -131,13 +128,15 @@ export function AdminSection() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (adminUsername === OWNER_USERNAME && adminPassword === OWNER_PASSWORD) {
+    const result = validateOwnerLogin(adminUsername, adminPassword, "orders");
+
+    if (result.ok) {
       setIsLoggedIn(true);
       setAdminUsername("");
       setAdminPassword("");
       setError(null);
     } else {
-      setError("❌ Invalid username or password");
+      setError(result.message);
       setAdminPassword("");
     }
   };

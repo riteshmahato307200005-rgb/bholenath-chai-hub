@@ -66,7 +66,7 @@ export function Navbar() {
         <div className="flex h-16 items-center justify-between md:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <img src={logo} alt="Bholenath Chai" className="h-8 w-8 md:h-10 md:w-10" width={40} height={40} />
+            <img src={logo} alt="Bholenath Chai" className="h-10 w-10 md:h-12 md:w-12" width={48} height={48} />
             <span className="text-xl font-bold font-heading md:text-2xl">
               <span className="text-saffron">Bholenath</span>
               <span className={useSolidNavbar ? "text-accent-foreground" : "text-cream"}> Chai</span>
